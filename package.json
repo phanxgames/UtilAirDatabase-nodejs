@@ -1,0 +1,9 @@
+{
+  "name": "UtilAirDatabase_nodejs",
+  "version": "1.0.0",
+  "devDependencies": {
+    "@types/node": "^20.4.9"
+  },
+  "dependencies": {
+  }
+}
