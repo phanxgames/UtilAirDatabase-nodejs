@@ -1,0 +1,7 @@
+{
+  "UtilAirDatabase": {
+    "path": "/path/to/UtilAirDatabase.exe",
+    "port": 9999,
+    "timeout": -1
+  }
+}

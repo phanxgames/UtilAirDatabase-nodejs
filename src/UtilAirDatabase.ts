@@ -1,12 +1,9 @@
 import {Server, Socket} from "node:net";
 import {exec, execFile} from "node:child_process";
+import * as os from "node:os";
+import config from "../config.json";
 
 export class UtilAirDatabase {
-
-    public static UTIL_AIR_PATH:string = "/Users/henry/Documents/GitHub/UtilAirDatabase/out/UtilAirDatabase.app";
-    public static TIMEOUT:number = -1;
-    public static PORT:number = 9999;
-
 
     public static callbackIncrement:number = 0;
     public static socketServer:Server = null;
@@ -67,7 +64,7 @@ export class UtilAirDatabase {
     protected static _executeSocketAPI(command:string) {
         return new Promise(async (resolve, reject) => {
             const cb = ++this.callbackIncrement;
-            command += ` socket=${this.PORT} socketcb=${cb} nogui`;
+            command += ` socket=${config.UtilAirDatabase.port} socketcb=${cb} nogui`;
 
             const _cancelExecution = () => {
                 if (timeout) clearTimeout(timeout);
@@ -91,15 +88,21 @@ export class UtilAirDatabase {
             this._setupSocketServer();
 
             let timeout = null;
-            if (this.TIMEOUT > 0) {
+            if (config.UtilAirDatabase.timeout > 0) {
                 timeout = setTimeout(() => {
                     _cancelExecution();
                     reject("timed out");
-                }, this.TIMEOUT);
+                }, config.UtilAirDatabase.timeout);
             }
 
             //call execute on child process of node
-            let cmd = `open -a ${this.UTIL_AIR_PATH} --args ${command}`;
+            let cmd;
+            if (os.platform() === 'win32') {
+                cmd = `${config.UtilAirDatabase.path} ${command}`;
+            } else if (os.platform() === 'darwin') {
+                cmd = `open -a ${config.UtilAirDatabase.path} --args ${command}`;
+            }
+
             console.log("EXEC " + cmd);
             exec(cmd, (error:any, stdout:any, stderr:any) => {
                 if (error) {
@@ -134,7 +137,7 @@ export class UtilAirDatabase {
                     if (fn) fn(data);
                 });
             });
-            this.socketServer.listen(this.PORT);
+            this.socketServer.listen(config.UtilAirDatabase.port);
         }
         return this.socketServer;
     }
@@ -153,5 +156,6 @@ export class UtilAirDatabase {
         }
         return message;
     }
+
 
 }
